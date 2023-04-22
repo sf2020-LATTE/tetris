@@ -1,11 +1,10 @@
 
  <script setup lang="ts">
- import TopPage from "./pages/TopPage.vue";
- </script>
+</script>
 
- <template>
-   <TopPage />
- </template>
+<template>
+  <router-view />
+</template>
 
 <style scoped>
 .logo {
