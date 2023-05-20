@@ -1,42 +1,55 @@
 <script lang="ts" setup>
-const row =  20;
-const colomn =  10;
+// 状態管理を行うため reactive 関数を読み込む
+import { reactive } from "vue";
+// テトリミノを扱うため Tetromino クラスや TETROMINO_TYPE を読み込む
+import { Tetromino, TETROMINO_TYPE } from '../common/Tetromino';
+// テトリスのフィールドを扱うための Field クラスを読み込む
+import { Field } from '../common/Field';
 
-const field = new Array(row);
+let staticField = new Field();
+const tetris = reactive({
+  field: new Field(),
+});
 
-for (let i = 0; i < row; i++) {
-    const fieldColumn = new Array(colomn).fill(0);
-    field[i] = fieldColumn;
-}
-field[0][0] = 1;
-field[1][0] = 1;
-field[2][0] = 1;
-field[3][0] = 1;
+const tetromino = reactive({
+  current: Tetromino.random(),
+  position: { x: 3, y: 0 },
+});
 
 
-const classBlockColor = (x: number, y: number): string => {
-  const type = field[y][x];
-  if (type > 0) {
-    switch (type) {
-      case 1:
-        return "block-i";
-      case 2:
-        return "block-o";
-      case 3:
-        return "block-s";
-      case 4:
-        return "block-z";
-      case 5:
-        return "block-j";
-      case 6:
-        return "block-l";
-      case 7:
-        return "block-t";
-      default:
-        return "";
+
+// const classBlockColor = (x: number, y: number): string => {
+const classBlockColor = (_x: number, _y: number): string => {
+  const type = tetris.field.data[_y][_x];
+
+  if(type > 0) {
+    return Tetromino.id(type as TETROMINO_TYPE);
+  }
+
+  const { x, y } = tetromino.position;
+  const { data } = tetromino.current;
+
+  if (y <= _y && _y < y + data.length) {
+    const cols = data[_y - y];
+    if (x <= _x && _x < x + cols.length) {
+      if (cols[_x - x] > 0) {
+        return Tetromino.id(cols[_x - x] as TETROMINO_TYPE);
+      }
     }
   }
+
+  return "";
 }
+
+setInterval(() => {
+  tetris.field = Field.deepCopy(staticField);
+
+  tetromino.position.y++;
+
+  tetris.field.update(tetromino.current.data, tetromino.position);
+}, 1 * 1000);
+
+tetris.field.update(tetromino.current.data, tetromino.position);
 
 </script>
 
@@ -45,6 +58,7 @@ const classBlockColor = (x: number, y: number): string => {
   <h2>ユーザ名: {{ $route.query.name }}</h2>
   <div class = "container">
     <table class="field" style = "border-collapse: collapse">
+      <tr v-for="(row, y) in tetris.field.data" :key="y"></tr>
       <tr
         v-for="(row, y) in field"
         :key = "y">
