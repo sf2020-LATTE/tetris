@@ -6,19 +6,21 @@ import { Tetromino, TETROMINO_TYPE } from '../common/Tetromino';
 // テトリスのフィールドを扱うための Field クラスを読み込む
 import { Field } from '../common/Field';
 
+// フィールドの初期化
 let staticField = new Field();
+
+// テトリミノ落下中のテトリスのフィールドを保持する
 const tetris = reactive({
   field: new Field(),
 });
 
+// 落下中のテトリミノを保持する
 const tetromino = reactive({
   current: Tetromino.random(),
   position: { x: 3, y: 0 },
 });
 
 
-
-// const classBlockColor = (x: number, y: number): string => {
 const classBlockColor = (_x: number, _y: number): string => {
   const type = tetris.field.data[_y][_x];
 
@@ -41,11 +43,13 @@ const classBlockColor = (_x: number, _y: number): string => {
   return "";
 }
 
+// テトリミノを落下させる処理
 setInterval(() => {
   tetris.field = Field.deepCopy(staticField);
 
   tetromino.position.y++;
-
+  console.log('hogehoge');
+  console.log(tetromino.current.data);
   tetris.field.update(tetromino.current.data, tetromino.position);
 }, 1 * 1000);
 
@@ -58,10 +62,7 @@ tetris.field.update(tetromino.current.data, tetromino.position);
   <h2>ユーザ名: {{ $route.query.name }}</h2>
   <div class = "container">
     <table class="field" style = "border-collapse: collapse">
-      <tr v-for="(row, y) in tetris.field.data" :key="y"></tr>
-      <tr
-        v-for="(row, y) in field"
-        :key = "y">
+      <tr v-for="(row, y) in tetris.field.data" :key="y">
         <td
           class="block"
           v-for="(col, x) in row"
