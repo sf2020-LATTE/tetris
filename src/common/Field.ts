@@ -39,7 +39,7 @@ export class Field {
 
     static deepCopy = (field: Field): Field => {
         const data = field.data;
-        const newFieldData = new Array<Array<number>>(data.length);src/pages/PlayPage.vue
+        const newFieldData = new Array<Array<number>>(data.length);
 
         for (const [i, rows] of data.entries()) {
             newFieldData[i] = new Array(rows.length);
