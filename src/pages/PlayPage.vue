@@ -43,14 +43,45 @@ const classBlockColor = (_x: number, _y: number): string => {
   return "";
 }
 
-// テトリミノを落下させる処理
-setInterval(() => {
+
+// テトリミノの落下判定を行い真偽値を返却する
+const canDropCurrentTetrimino = ():boolean => {
+  const{ x, y } = tetromino.position;
+
+  const droppedPosition = { x, y: y + 1 };
+
+  const data = tetromino.current.data;
+  return tetris.field.canMove(data, droppedPosition);
+}
+
+// テトリスのフィールドの状態を保存して、
+// 次に落下するテトリミノのフィールドの状態を初期化する
+const nextTetrisField = () => {
+  const data = tetromino.current.data;
+  const position = tetromino.position;
+
+  tetris.field.update(data, position);
+
+  staticField = new Field(tetris.feild.data);
   tetris.field = Field.deepCopy(staticField);
 
-  tetromino.position.y++;
-  console.log('hogehoge');
-  console.log(tetromino.current.data);
-  tetris.field.update(tetromino.current.data, tetromino.position);
+  tetromino.current = Tetromino.random();
+  tetromino.position = { x: 3, y: 0 };
+
+}
+
+// テトリミノを落下させる処理
+// setInterval(func, delay) で delay ミリ秒ごとに func を実行する
+setInterval(() => {
+  tetris.field = Field.deepCopy(staticField);
+  console.log('tetris.field')
+  console.log(tetris.field)
+
+  if(canDropCurrentTetrimino()){
+    tetromino.position.y++;
+  } else {
+    nextTetrisField();
+  }
 }, 1 * 1000);
 
 tetris.field.update(tetromino.current.data, tetromino.position);
