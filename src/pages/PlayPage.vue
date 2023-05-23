@@ -62,7 +62,7 @@ const nextTetrisField = () => {
 
   tetris.field.update(data, position);
 
-  staticField = new Field(tetris.feild.data);
+  staticField = new Field(tetris.field.data);
   tetris.field = Field.deepCopy(staticField);
 
   tetromino.current = Tetromino.random();
