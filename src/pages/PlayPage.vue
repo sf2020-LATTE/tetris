@@ -83,6 +83,7 @@ const onKeyDown = (e:KeyboardEvent) => {
     case "ArrowDown":
       if(canDropCurrentTetrimino()){
         tetromino.position.y++;
+        resetDrop();
       } else {
         nextTetrisField();
       }
@@ -99,17 +100,29 @@ onBeforeUnmount(function(){
 })
 
 
-// テトリミノを落下させる処理
-// setInterval(func, delay) で delay ミリ秒ごとに func を実行する
-setInterval(() => {
-  tetris.field = Field.deepCopy(staticField);
+const resetDropInterval = () => {
+  let intervalId = -1;
 
-  if(canDropCurrentTetrimino()){
-    tetromino.position.y++;
-  } else {
-    nextTetrisField();
-  }
-}, 1 * 1000);
+  return () => {
+    if (intervalId !== -1) clearInterval(intervalId);
+        // テトリミノを落下させる処理 setInterval(func, delay) で delay ミリ秒ごとに func を実行する
+
+      intervalId = setInterval(() => {
+        tetris.field = Field.deepCopy(staticField);
+
+        if(canDropCurrentTetrimino()){
+          tetromino.position.y++;
+        } else {
+          nextTetrisField();
+        }
+      }, 1 * 1000);
+  };
+};
+
+const resetDrop = resetDropInterval();
+
+resetDrop();
+
 
 tetris.field.update(tetromino.current.data, tetromino.position);
 
