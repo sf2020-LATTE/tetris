@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 // 状態管理を行うため reactive 関数を読み込む
-import { reactive } from "vue";
+import { reactive, onMounted, onBeforeUnmount } from "vue";
+
 // テトリミノを扱うため Tetromino クラスや TETROMINO_TYPE を読み込む
 import { Tetromino, TETROMINO_TYPE } from '../common/Tetromino';
 // テトリスのフィールドを扱うための Field クラスを読み込む
 import { Field } from '../common/Field';
 
 import TetrominoPreviewComponent from '../components/TetrominoPreviewComponent.vue';
+import func from "../../vue-temp/vue-editor-bridge";
 
 // フィールドの初期化
 let staticField = new Field();
@@ -74,6 +76,28 @@ const nextTetrisField = () => {
   tetromino.position = { x: 3, y: 0 };
 
 }
+
+const onKeyDown = (e:KeyboardEvent) => {
+  switch(e.key){
+    case "Down":
+    case "ArrowDown":
+      if(canDropCurrentTetrimino()){
+        tetromino.position.y++;
+      } else {
+        nextTetrisField();
+      }
+      break;
+  }
+}
+
+onMounted(function(){
+  document.addEventListener("keydown", onKeyDown);
+});
+
+onBeforeUnmount(function(){
+  document.removeEventListener('keydown', onKeyDown)
+})
+
 
 // テトリミノを落下させる処理
 // setInterval(func, delay) で delay ミリ秒ごとに func を実行する
