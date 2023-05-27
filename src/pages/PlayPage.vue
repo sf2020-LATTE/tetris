@@ -6,6 +6,8 @@ import { Tetromino, TETROMINO_TYPE } from '../common/Tetromino';
 // テトリスのフィールドを扱うための Field クラスを読み込む
 import { Field } from '../common/Field';
 
+import TetrominoPreviewComponent from '../components/TetrominoPreviewComponent.vue';
+
 // フィールドの初期化
 let staticField = new Field();
 
@@ -18,6 +20,7 @@ const tetris = reactive({
 const tetromino = reactive({
   current: Tetromino.random(),
   position: { x: 3, y: 0 },
+  next: Tetromino.random()
 });
 
 
@@ -65,7 +68,9 @@ const nextTetrisField = () => {
   staticField = new Field(tetris.field.data);
   tetris.field = Field.deepCopy(staticField);
 
-  tetromino.current = Tetromino.random();
+  tetromino.current = tetromino.next;
+  tetromino.next = Tetromino.random();
+
   tetromino.position = { x: 3, y: 0 };
 
 }
@@ -74,8 +79,6 @@ const nextTetrisField = () => {
 // setInterval(func, delay) で delay ミリ秒ごとに func を実行する
 setInterval(() => {
   tetris.field = Field.deepCopy(staticField);
-  console.log('tetris.field')
-  console.log(tetris.field)
 
   if(canDropCurrentTetrimino()){
     tetromino.position.y++;
@@ -92,6 +95,7 @@ tetris.field.update(tetromino.current.data, tetromino.position);
   <h1>プレイ画面</h1>
   <h2>ユーザ名: {{ $route.query.name }}</h2>
   <div class = "container">
+    <div class="tetris">
     <table class="field" style = "border-collapse: collapse">
       <tr v-for="(row, y) in tetris.field.data" :key="y">
         <td
@@ -102,10 +106,18 @@ tetris.field.update(tetromino.current.data, tetromino.position);
         />
       </tr>
     </table>
+    </div>
+    <div class="information">
+      <TetrominoPreviewComponent v-bind:tetromino="tetromino.next.data"/>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+
+.information {
+  margin-left: 0.5em;
+}
 .container {
   display: flex;
   justify-content: center;
