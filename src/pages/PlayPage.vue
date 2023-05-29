@@ -50,7 +50,7 @@ const classBlockColor = (_x: number, _y: number): string => {
 
 
 // テトリミノの落下判定を行い真偽値を返却する
-const canDropCurrentTetrimino = ():boolean => {
+const canDropCurrentTetromino = ():boolean => {
   const{ x, y } = tetromino.position;
 
   const droppedPosition = { x, y: y + 1 };
@@ -81,12 +81,20 @@ const onKeyDown = (e:KeyboardEvent) => {
   switch(e.key){
     case "Down":
     case "ArrowDown":
-      if(canDropCurrentTetrimino()){
+      if(canDropCurrentTetromino()){
         tetromino.position.y++;
         resetDrop();
       } else {
         nextTetrisField();
       }
+      break;
+    case "Up":
+    case "ArrowUp":
+      while(canDropCurrentTetromino()){
+        tetromino.position.y++;
+        resetDrop();
+      }
+      nextTetrisField();
       break;
   }
 }
@@ -110,7 +118,7 @@ const resetDropInterval = () => {
       intervalId = setInterval(() => {
         tetris.field = Field.deepCopy(staticField);
 
-        if(canDropCurrentTetrimino()){
+        if(canDropCurrentTetromino()){
           tetromino.position.y++;
         } else {
           nextTetrisField();
